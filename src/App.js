@@ -1,25 +1,206 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import React,{useState, useEffect} from 'react'
+import View from './View';
+import "./App.css"
+// getting the values of local storage
+const getDatafromLS=()=>{
+  const data = localStorage.getItem('books');
+  if(data){
+    return JSON.parse(data);
+  }
+  else{
+    return []
+  }
 }
 
-export default App;
+export const App = () => {
+
+  // main array of objects state || books state || books array of objects
+  const [books, setbooks]=useState(getDatafromLS());
+
+  // input field states
+  const [title, setTitle]=useState('');
+  const [author, setAuthor]=useState('');
+  const [isbn, setIsbn]=useState('');
+
+  // form submit event
+  const handleAddBookSubmit=(e)=>{
+    e.preventDefault();
+    // creating an object
+    let book={
+      title,
+      author,
+      isbn
+    }
+    setbooks([...books,book]);
+    setTitle('');
+    setAuthor('');
+    setIsbn('');
+  }
+
+  // delete book from LS
+  const deleteBook=(isbn)=>{
+    const filteredBooks=books.filter((element,index)=>{
+      return element.isbn !== isbn
+    })
+    setbooks(filteredBooks);
+  }
+
+  // saving data to local storage
+  useEffect(()=>{
+    localStorage.setItem('books',JSON.stringify(books));
+  },[books])
+
+  return (
+    <div className='wrapper'>
+      <h1 style={{textAlign:"center",textDecoration:"underline",textDecorationColor:"red"}}>BookList App</h1>
+      <p style={{textAlign:"center"}}>Add and view your books using local storage</p>
+      <div className='main'>
+
+        <div className='form-container'>
+          <form autoComplete="off" className='form-group'
+          onSubmit={handleAddBookSubmit}>
+            <label>Title</label><br></br>
+            <input type="text" className='form-control' required
+            onChange={(e)=>setTitle(e.target.value)} value={title}></input>
+            <br></br>
+            <label>Author</label><br/>
+            <input type="text" className='form-control' required
+            onChange={(e)=>setAuthor(e.target.value)} value={author}></input>
+            <br></br>
+            <label>Code</label><br/>
+            <input type="text" className='form-control' required
+            onChange={(e)=>setIsbn(e.target.value)} value={isbn}></input>
+            <br></br><br/>
+            <button type="submit" className='btn btn-success btn-md' style={{backgroundColor:"red",width:"100px",fontSize:"17px"}}>
+              ADD
+            </button>
+            <br></br>
+          </form>
+        </div>
+
+        <div className='view-container'>
+          {books.length>0&&<>
+            <div className='table-responsive'>
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th>ISBN#</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <View books={books} deleteBook={deleteBook}/>
+                </tbody>
+              </table>
+            </div>
+            <button className='btn btn-danger btn-md'
+            onClick={()=>setbooks([])}>Remove All</button>
+          </>}
+          {books.length < 1 && <div style={{marginLeft:"20%",fontWeight:"bold"}}>No books are added yet</div>}
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+export default App
+// import React,{useState,useEffect} from "react"
+// import './App.css';
+// import View from "./View";
+// //getting the values of local storage
+// const getDatafromLS=()=>{
+//   const data=localStorage.getItem('books');
+//   if(data){
+//     return JSON.parse(data)
+//   }
+//   else{
+//     return []
+//   }
+// }
+// function App() {
+//   const [books,setbooks]=useState(getDatafromLS());
+//   const [title,settitle]=useState('');
+//   const[author,setauthor]=useState('');
+//   const[code,setcode]=useState('');
+//   const handleAddBookSubmit=(e)=>{
+//     e.preventDefault();
+//     let book={
+//       title,
+//       author,
+//       code
+
+//     }
+//     setbooks([...books,book])
+//     settitle('');
+//     setauthor('');
+//     setcode('');
+//   }
+//   const deleteBook=(code)=>{
+//     // console.log(code)
+//     const filteredBooks=books.filter((element,index) =>{
+//     return element.code !== code;
+//     })
+//     setbooks(filteredBooks);
+//   }
+//   //saving data to local stoarge
+//  useEffect(()=>{
+//   localStorage.setItem('books',JSON.stringify(books))
+//  },[books])
+//   return (
+//     <div className="App">
+//       <div className='wrapper'>
+//       <h1>BookList App</h1>
+//       <p>Add and view your books using local storage</p>
+//       <div className='main'>
+
+//         <div className='form-container'>
+//           <form autoComplete="off" className='form-group'
+//           onSubmit={handleAddBookSubmit}>
+//             <label>Title</label>
+//             <input type="text" className='form-control' required
+//             onChange={(e)=>settitle(e.target.value)} value={title}></input>
+//             <br></br>
+//             <label>Author</label>
+//             <input type="text" className='form-control' required
+//             onChange={(e)=>setauthor(e.target.value)} value={author}></input>
+//             <br></br>
+//             <label>CODE</label>
+//             <input type="text" className='form-control' required
+//             onChange={(e)=>setcode(e.target.value)} value={code}></input>
+//             <br></br>
+//             <button type="submit" className='btn btn-success btn-md'>
+//               ADD
+//             </button>
+//           </form>
+//         </div>
+//         <div className="view-container">
+//           {books.length>0 &&  
+//           <>
+//           <div className="table-responsive">
+//             <table className="table">
+//               <thead>
+//                 <tr>
+//                   <th>CODE</th>
+//                   <th>Title</th>
+//                   <th>Author</th>
+//                   <th>Delete</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 <View books={books} deleteBook={deleteBook}/>
+//               </tbody>
+//             </table>
+//           </div>
+//           </>}
+//           {books.length<1 && <div>no books are added yet</div>}
+//         </div>
+// </div>
+// </div>
+//          </div>
+//   );
+// }
+
+// export default App;
